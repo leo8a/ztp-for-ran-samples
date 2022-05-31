@@ -1,0 +1,44 @@
+apiVersion: ran.openshift.io/v1
+kind: PolicyGenTemplate
+metadata:
+  # The name will be used to generate the placementBinding and placementRule names as {name}-placementBinding and {name}-placementRule
+  name: "group-du-sno"
+  namespace: "ztp-group"
+spec:
+  bindingRules:
+    # These policies will correspond to all clusters with this label:
+    group-du-sno: ""
+  mcp: "master"
+  sourceFiles:
+    - fileName: ConsoleOperatorDisable.yaml
+      policyName: "config-policy"
+    # Set ClusterLogForwarder & ClusterLogging as example might be better to create another policyTemp-Group
+    - fileName: ClusterLogForwarder.yaml
+      policyName: "config-policy"
+      spec:
+        outputs:
+          - type: "kafka"
+            name: kafka-open
+            # below url is an example
+            url: tcp://10.46.55.190:9092/test
+        pipelines:
+          - name: audit-logs
+            inputRefs:
+             - audit
+            outputRefs:
+             - kafka-open
+          - name: infrastructure-logs
+            inputRefs:
+             - infrastructure
+            outputRefs:
+             - kafka-open
+    - fileName: ClusterLogging.yaml
+      policyName: "config-policy"
+      spec:
+        curation:
+          curator:
+            schedule: "30 3 * * *"
+        collection:
+          logs:
+            type: "fluentd"
+            fluentd: {}

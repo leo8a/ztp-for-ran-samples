@@ -1,0 +1,68 @@
+apiVersion: ran.openshift.io/v1
+kind: SiteConfig
+metadata:
+  name: "hub-spoke-sno"
+  namespace: "hub-spoke-sno"
+spec:
+  baseDomain: "karmalabs.com"
+  pullSecretRef:
+    name: "assisted-deployment-pull-secret"
+  clusterImageSetNameRef: "img4.10.15-x86-64-appsub"
+  sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwGdfu2XBlffVDU45E6Y8BuGmVJ8uJJUvfcEMhAKeAs/v6WG0svM6yhJwhh0avw2Uk2kw3ZLKP087u1DKiCdPbgLIMKrWDvz+xVHCrbcqYy2NwoR1HPsQIFMMy0kchoAgIlbXYRBKFSNYWxZknazo7YnnTS27JoL740Dq+B0wmuUgihS17Hd/9r/dWVn0h7DjDWxQpgXlb4PL833d2QYl+S9UMExgaHaQYsl6rDzQA1Q1Pl71LWV22oO8rKkBCCKYwbzVRZKZc1i3UB9WfiptpFCEX6HZCfhnkbHjDvflLtlGEjga8rK4SRMv2M8YfRdlGXhTHlW093YjjMENmBIhZtWe0ygSPD5ASgnj8X3/dhgTklRFZvExf2fl3viobHXmxR8rIWXX9KUKrxZtk6rRiY52BKPrxBoQqcOdWGrnJU8lVTOWbeYcvX5XW2giIanZmkXJXva5lMlTdbkNQFl6HJmWIMRlpjghUtAZORVZ2JIThHkDF+EQavW68yNwtHwU= root@bastion-aio1-8a.e2e.bos.redhat.com"
+  clusters:
+  - clusterName: "hub-spoke-sno"
+    networkType: "OVNKubernetes"
+    clusterLabels:
+      common-410: true
+      group-du-sno: ""
+      sites : "hub-spoke-sno"
+      vendor: "OpenShift"
+    clusterNetwork:
+      - cidr: 172.16.0.0/14
+        hostPrefix: 23
+    machineNetwork:
+      - cidr: 192.168.122.0/24
+    serviceNetwork:
+      - 10.10.0.0/16
+    additionalNTPSources:
+      - clock.corp.redhat.com
+    nodes:
+      - hostName: "hub-spoke-sno.karmalabs.com"
+        role: "master"
+        bmcAddress: "redfish-virtualmedia+http://sushy-openshift-infra.apps.hub.karmalabs.com/redfish/v1/Systems/11111111-1111-1111-1111-111111111191"
+        bmcCredentialsName:
+          name: "spoke-bmc-secret"
+        bootMACAddress: "aa:aa:aa:cc:cc:01"
+        bootMode: "legacy"
+        rootDeviceHints:
+          deviceName: "/dev/sda"
+        cpuset: "0-1,6-7"
+        nodeNetwork:
+          interfaces:
+            - name: enp1s0
+              macAddress: "aa:aa:aa:cc:cc:01"
+          config:
+            interfaces:
+              - name: enp1s0
+                type: ethernet
+                state: up
+                macAddress: "aa:aa:aa:cc:cc:01"
+                ipv4:
+                  enabled: true
+                  address:
+                    - ip: 192.168.122.30
+                      prefix-length: 24
+                ipv6:
+                  enabled: false
+            dns-resolver:
+              config:
+                search:
+                - karmalabs.com
+                server:
+                - 192.168.122.253
+            routes:
+              config:
+              - destination: 0.0.0.0/0
+                next-hop-interface: enp1s0
+                next-hop-address: 192.168.122.1
+                table-id: 254

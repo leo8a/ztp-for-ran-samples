@@ -1,0 +1,58 @@
+apiVersion: ran.openshift.io/v1
+kind: PolicyGenTemplate
+metadata:
+  name: "common-410"
+  namespace: "ztp-common"
+spec:
+  bindingRules:
+    common-410: "true"
+  remediationAction: inform
+  sourceFiles:
+    # Create operators policies that will be installed in all clusters
+    # SRIOV
+    - fileName: SriovSubscription.yaml
+      policyName: "subscriptions-policy"
+      spec:
+        channel: "4.10"
+    - fileName: SriovSubscriptionNS.yaml
+      policyName: "subscriptions-policy"
+    - fileName: SriovSubscriptionOperGroup.yaml
+      policyName: "subscriptions-policy"
+    #PTP
+    - fileName: PtpSubscription.yaml
+      policyName: "subscriptions-policy"
+      spec:
+        channel: "stable"
+    - fileName: PtpSubscriptionNS.yaml
+      policyName: "subscriptions-policy"
+    - fileName: PtpSubscriptionOperGroup.yaml
+      policyName: "subscriptions-policy"
+    # PAO
+    - fileName: PaoSubscription.yaml
+      policyName: "subscriptions-policy"
+      spec:
+        source: redhat-operators
+        channel: "4.10"
+    - fileName: PaoSubscriptionNS.yaml
+      policyName: "subscriptions-policy"
+    - fileName: PaoSubscriptionOperGroup.yaml
+      policyName: "subscriptions-policy"
+    # CLO
+    - fileName: ClusterLogNS.yaml
+      policyName: "subscriptions-policy"
+    - fileName: ClusterLogOperGroup.yaml
+      policyName: "subscriptions-policy"
+    - fileName: ClusterLogSubscription.yaml
+      policyName: "subscriptions-policy"
+    # LSO
+    - fileName: StorageNS.yaml
+      policyName: "subscriptions-policy"
+    - fileName: StorageOperGroup.yaml
+      policyName: "subscriptions-policy"
+    - fileName: StorageSubscription.yaml
+      policyName: "subscriptions-policy"
+      spec:
+        channel: "4.10"
+      # Reduce Monitoring Operator Footprint
+    - fileName: ReduceMonitoringFootprint.yaml
+      policyName: "config-policy"
