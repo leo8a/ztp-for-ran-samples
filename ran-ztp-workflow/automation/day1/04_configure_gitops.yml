@@ -1,0 +1,48 @@
+---
+- name: Configure GitOps operator
+  hosts: localhost
+
+  vars:
+    gitops_source_path_site: siteconfig
+    gitops_source_path_pgt: policygentemplates
+    gitops_source_repoURL: https://github.com/leo8a/ztp-for-ran-samples
+    gitops_source_targetRevision: empty-sites
+
+  tasks:
+    - name: Clone openshift-kni/cnf-features-deploy repo
+      git:
+        repo: https://github.com/openshift-kni/cnf-features-deploy.git
+        dest: /opt/cnf-features-deploy
+        update: yes
+        force: yes
+      notify:
+        - Patch GitOps operator
+        - Create folder for GitOps pipeline
+        - Prepare GitOps pipeline
+        - Apply GitOps pipeline
+
+  handlers:
+    - name: Patch GitOps operator
+      command: >
+        oc patch argocd openshift-gitops -n openshift-gitops 
+                        --type=merge \
+                        --patch-file \
+                        /opt/cnf-features-deploy/ztp/gitops-subscriptions/argocd/deployment/argocd-openshift-gitops-patch.json
+
+    - name: Create folder for GitOps pipeline
+      copy:
+        src: /opt/cnf-features-deploy/ztp/gitops-subscriptions/argocd/deployment
+        dest: /opt/gitops-pipeline
+
+    - name: Prepare GitOps pipeline
+      template:
+        src: manifests/{{ item }}
+        dest: /opt/gitops-pipeline/deployment/{{ item }}
+      loop:
+        - clusters-app.yaml
+        - policies-app.yaml
+
+    - name: Apply GitOps pipeline
+      k8s:
+        definition: "{{ lookup('kubernetes.core.kustomize', 
+                        dir='/opt/gitops-pipeline/deployment') }}"

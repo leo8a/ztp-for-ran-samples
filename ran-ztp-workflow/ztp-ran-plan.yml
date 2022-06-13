@@ -1,0 +1,76 @@
+# ====================== #
+# Parameters to override #
+# ====================== #
+parameters:
+  cluster: hub
+  version: stable
+  network: default
+  tag: '4.10'
+  masters: 1
+  workers: 0
+  memory: 65536
+  numcpus: 32
+  disk_size: 100
+  pull_secret: /root/pull_secret.json
+  apps:
+  - users
+  - odf-lvm-operator
+  - openshift-gitops-operator
+  - advanced-cluster-management
+
+
+# ===================== #
+# Hub OpenShift cluster #
+# ===================== #
+{{ cluster }}:
+  type: kube
+  kubetype: openshift
+  cluster: {{ cluster }}
+  tag: {{ tag }}
+  metal3: true
+  sushy: true
+  masters: {{ masters }}
+  workers: {{ workers }}
+  version: {{ version }}
+  network_type: OVNKubernetes
+  memory: {{ memory }}
+  numcpus: {{numcpus }}
+  network: {{ network }}
+  pull_secret: {{ pull_secret }}
+  apps: {{ apps }}
+  kvm_openstack: true
+  disk_size: {{ disk_size }}
+  extra_disks: [100]
+  #disconnected_deploy: true
+
+
+# ======================= #
+# Spoke OpenShift cluster #
+# ======================= #
+{{ cluster }}-spoke-sno:
+  uuid: 11111111-1111-1111-1111-111111111191
+  type: vm
+  numcpus: 8
+  start: false
+  cloudinit: false
+  uefi_legacy: true
+  memory: 32768
+  nets:
+  - name: {{ network }}
+    mac: aa:aa:aa:cc:cc:01
+  disks:
+  - size: 120
+    interface: scsi
+
+
+# ===================================== #
+# Update manifests for RAN ZTP Workflow #
+# ===================================== #
+ztp:
+  type: workflow
+  files:
+    - automation/day1/manifests/01_apply_ais_cr.yaml.sample
+    - automation/day2/manifests/02_pull_secret.yaml.sample
+  scripts:
+    - hacks/installer/update_pull_secret.sh
+    - hacks/installer/update_agent_service_config.sh

@@ -1,2 +1,6 @@
+# Folder
+*.idea
+
 # Files
-day2/manifests/02_pull_secret.yaml
+ran-ztp-workflow/openshift-install
+ran-ztp-workflow/automation/day2/manifests/02_pull_secret.yaml

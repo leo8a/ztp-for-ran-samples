@@ -1,0 +1,10 @@
+---
+- name: Patch Bare Metal Operator (BMO)
+  hosts: localhost
+
+  tasks:
+    - name: Patch Provisioning resource to allow BMO watching all namespaces
+      k8s:
+        state: present
+        src: manifests/00_patch_bmo.yaml
+        wait: true

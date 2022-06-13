@@ -1,0 +1,36 @@
+---
+- name: Deploy RAN cluster via SiteConfig CR
+  hosts: localhost
+
+  vars:
+    bmc_username: ADMIN
+    bmc_password: ADMIN
+    gitops_source_path_site: siteconfig
+    gitops_source_path_pgt: policygentemplates
+    gitops_source_repoURL: https://github.com/leo8a/ztp-for-ran-samples
+    gitops_source_targetRevision: sushy-siteconfig
+
+  tasks:
+    - name: Apply SiteConfig pre-requisites
+      k8s:
+        state: present
+        src: "{{ item }}"
+      loop:
+        - manifests/00_namespace.yaml
+        - manifests/01_bmc-secret.yaml
+        - /opt/gitops-manifests/02_pull_secret.yaml
+
+    - name: Add SiteConfig & PGTs to GitOps repo
+      template:
+        src: manifests/{{ item }}
+        dest: /opt/gitops-pipeline/deployment/{{ item }}
+      loop:
+        - clusters-app.yaml
+        - policies-app.yaml
+      notify: Apply GitOps pipeline
+
+  handlers:
+    - name: Apply GitOps pipeline
+      k8s:
+        definition: "{{ lookup('kubernetes.core.kustomize',
+                        dir='/opt/gitops-pipeline/deployment') }}"

@@ -7,7 +7,7 @@ spec:
   baseDomain: "karmalabs.com"
   pullSecretRef:
     name: "assisted-deployment-pull-secret"
-  clusterImageSetNameRef: "img4.10.15-x86-64-appsub"
+  clusterImageSetNameRef: "img4.10.16-x86-64-appsub"
   sshPublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCwGdfu2XBlffVDU45E6Y8BuGmVJ8uJJUvfcEMhAKeAs/v6WG0svM6yhJwhh0avw2Uk2kw3ZLKP087u1DKiCdPbgLIMKrWDvz+xVHCrbcqYy2NwoR1HPsQIFMMy0kchoAgIlbXYRBKFSNYWxZknazo7YnnTS27JoL740Dq+B0wmuUgihS17Hd/9r/dWVn0h7DjDWxQpgXlb4PL833d2QYl+S9UMExgaHaQYsl6rDzQA1Q1Pl71LWV22oO8rKkBCCKYwbzVRZKZc1i3UB9WfiptpFCEX6HZCfhnkbHjDvflLtlGEjga8rK4SRMv2M8YfRdlGXhTHlW093YjjMENmBIhZtWe0ygSPD5ASgnj8X3/dhgTklRFZvExf2fl3viobHXmxR8rIWXX9KUKrxZtk6rRiY52BKPrxBoQqcOdWGrnJU8lVTOWbeYcvX5XW2giIanZmkXJXva5lMlTdbkNQFl6HJmWIMRlpjghUtAZORVZ2JIThHkDF+EQavW68yNwtHwU= root@bastion-aio1-8a.e2e.bos.redhat.com"
   clusters:
   - clusterName: "hub-spoke-sno"

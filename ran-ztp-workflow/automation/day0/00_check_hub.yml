@@ -1,0 +1,49 @@
+---
+- name: Check RAN ZTP components in Hub OpenShift cluster
+  hosts: localhost
+
+  tasks:
+    - name: Check Storage Operator (presence of storage class)
+      k8s:
+        api_version: storage.k8s.io/v1
+        kind: StorageClass
+        name: odf-lvm-vg1
+        namespace: openshift-storage
+        state: present
+
+    - name: Check GitOps Operator (presence of deployments -> timeout ~20 mins)
+      k8s:
+        api_version: apps/v1
+        kind: Deployment
+        name: "{{ item }}"
+        namespace: openshift-gitops
+        state: present
+        wait: true
+        wait_timeout: 120
+      loop:
+        - openshift-gitops-redis
+        - openshift-gitops-server
+        - openshift-gitops-repo-server
+        - openshift-gitops-dex-server
+        - openshift-gitops-applicationset-controller
+      register: gitops_deploy
+      retries: 10
+      delay: 30
+      until: gitops_deploy is not failed
+
+    - name: Check ACM Operator (presence of MCH -> timeout ~60 mins)
+      k8s:
+        api_version: cluster.open-cluster-management.io/v1
+        kind: ManagedCluster
+        name: local-cluster
+        state: present
+        wait: true
+        wait_timeout: 480
+        wait_condition:
+          reason: ManagedClusterAvailable
+          status: "True"
+          type: ManagedClusterConditionAvailable
+      register: mch_deploy
+      retries: 30
+      delay: 30
+      until: mch_deploy is not failed

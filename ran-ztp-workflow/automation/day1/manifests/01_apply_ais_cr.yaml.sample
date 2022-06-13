@@ -1,0 +1,24 @@
+apiVersion: agent-install.openshift.io/v1beta1
+kind: AgentServiceConfig
+metadata:
+  namespace: open-cluster-management
+  name: agent
+spec:
+  databaseStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+  filesystemStorage:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+  osImages:
+    - openshiftVersion: "${MINOR}"
+      url: "${RHCOS_ISO}"
+      rootFSUrl: "${RHCOS_ROOTFS}"
+      cpuArchitecture: "x86_64"
+      version: "${VERSION}"

@@ -1,0 +1,27 @@
+---
+- name: Configure Assisted Installer Service (AIS)
+  hosts: localhost
+
+  tasks:
+    - name: Configure the AIS
+      k8s:
+        state: present
+        src: /opt/gitops-manifests/01_apply_ais_cr.yaml
+
+
+- name: Check AIS configuration
+  hosts: localhost
+
+  tasks:
+    - name: Check the AgentServiceConfig CR (timeout ~20 mins)    # AIS pod that handles the spoke cluster deployments
+      k8s:
+        api_version: agent-install.openshift.io/v1beta1
+        kind: AgentServiceConfig
+        name: agent
+        namespace: open-cluster-management
+        wait: true
+        wait_timeout: 1200
+        wait_condition:
+          type: ReconcileCompleted
+          status: "True"
+          reason: ReconcileSucceeded

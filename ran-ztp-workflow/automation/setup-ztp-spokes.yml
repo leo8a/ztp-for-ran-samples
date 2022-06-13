@@ -1,0 +1,23 @@
+---
+# ====================================== #
+# Install components of RAN ZTP solution #
+# ====================================== #
+
+- import_playbook: day0/00_check_hub.yml
+- import_playbook: day0/01_install_talo.yml
+
+
+# =============================== #
+# Configure components in the Hub #
+# =============================== #
+
+- import_playbook: day1/02_configure_bmo.yml      # (patch provisioning)
+- import_playbook: day1/03_configure_ais.yml      # (CRD - AgentServiceConfig)
+- import_playbook: day1/04_configure_gitops.yml   # (CRD - Application x2)
+
+
+# ================================== #
+# Add operation to GitOps Repository #
+# ================================== #
+
+- import_playbook: day2/05_install_ran_cluster.yml      # (CRD - SiteConfig & PolicyGenTemplate)
